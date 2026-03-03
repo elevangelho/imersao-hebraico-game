@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
     
-    <title>Imersão Hebraico</title>
+    <title>Desafio Hebraico - Elevangelho</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,8 +50,8 @@
         }
 
         #card-moldura {
-            width: 250px;
-            height: 250px;
+            width: 240px;
+            height: 240px;
             border: 1px solid #333;
             border-radius: 20px;
             display: flex;
@@ -65,7 +65,7 @@
 
         #letra-display {
             font-family: 'Frank Ruhl Libre', serif;
-            font-size: 130px;
+            font-size: 120px;
             line-height: 1;
             direction: rtl;
             font-weight: 700;
@@ -118,18 +118,40 @@
             justify-content: center;
             z-index: 20;
             text-align: center;
+            padding: 20px;
         }
 
         .btn-principal {
             background: #fff;
             color: #000;
             border: none;
-            padding: 16px 40px;
-            font-size: 1em;
+            padding: 16px 30px;
+            font-size: 0.9em;
             font-weight: bold;
             border-radius: 10px;
             letter-spacing: 2px;
             text-transform: uppercase;
+            cursor: pointer;
+            width: 260px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-youtube {
+            background: transparent;
+            color: #ff0000;
+            border: 1px solid #333;
+        }
+
+        /* Ícone de Play em Pixel Art */
+        .pixel-play {
+            width: 16px;
+            height: 16px;
+            background: #ff0000;
+            clip-path: polygon(20% 10%, 20% 90%, 80% 50%);
         }
 
         #lista-erros { width: 85%; max-width: 280px; margin: 15px 0; border-collapse: collapse; font-size: 0.85em; }
@@ -139,9 +161,14 @@
 <body>
 
     <div id="overlay-inicio" class="overlay">
-        <h2 style="letter-spacing: 4px; margin-bottom: 5px;">DESAFIO IMERSÃO</h2>
-        <h3 style="color: #444; margin-bottom: 35px; font-weight: normal;">ALFABETO + VOGAIS</h3>
+        <h2 style="letter-spacing: 2px; margin-bottom: 5px; font-size: 1.4em;">DESAFIO HEBRAICO BÁSICO</h2>
+        <h3 style="color: #e74c3c; margin-bottom: 35px; font-weight: bold; letter-spacing: 3px;">ELEVANGELHO</h3>
+        
         <button class="btn-principal" onclick="iniciarTudo()">Iniciar Jogo</button>
+        
+        <button class="btn-principal btn-youtube" onclick="window.open('https://youtu.be/TlPndO70Q-A', '_blank')">
+            <div class="pixel-play"></div> AULAS IMERSÃO
+        </button>
     </div>
 
     <div id="status-bar">
@@ -177,10 +204,10 @@
     </div>
 
 <script>
-    const letras = ["א", "בּ", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "כּ", "כ", "ל", "מ", "נ", "ס", "ע", "פּ", "פ", "צ", "ק", "ר", "שׁ", "שׂ", "ת"];
-    const sonsLetras = ["", "B", "G", "D", "H", "V", "Z", "CH", "T", "Y", "K", "KH", "L", "M", "N", "S", "", "P", "F", "TZ", "Q", "R", "SH", "S", "T"];
+    // Inclusão das Letras Sofit (Finais)
+    const letras = ["א", "בּ", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "כּ", "כ", "ל", "מ", "נ", "ס", "ע", "פּ", "פ", "צ", "ק", "ר", "שׁ", "שׂ", "ת", "ך", "ם", "ן", "ף", "ץ"];
+    const sonsLetras = ["", "B", "G", "D", "H", "V", "Z", "CH", "T", "Y", "K", "KH", "L", "M", "N", "S", "", "P", "F", "TZ", "Q", "R", "SH", "S", "T", "KH", "M", "N", "F", "TZ"];
     
-    // Adicionado Hiriq Yod (ִי)
     const nekudots = ["ָ", "ֵ", "ִ", "ֹ", "ֻ", "וֹ", "וּ", "ְ", "ֲ", "ֱ", "ִי"]; 
     const sonsVogais = ["A", "E", "I", "O", "U", "O", "U", "E", "A", "E", "I"];
     
@@ -210,16 +237,20 @@
         const nekudot = nekudots[iV];
         const vogalWaw = (nekudot === "וֹ" || nekudot === "וּ");
         const vogalYod = (nekudot === "ִי");
+        const ehSofit = ["ך", "ם", "ן", "ף", "ץ"].includes(letras[iL]);
 
         let baseSom = (letras[iL] === "א" || letras[iL] === "ע") ? "" : sonsLetras[iL];
         respostaCorreta = baseSom + sonsVogais[iV];
         if (respostaCorreta === "") respostaCorreta = sonsVogais[iV];
 
-        // Lógica para evitar duplicação de Waw ou Yod suporte
+        // Lógica de renderização
         if (vogalWaw) {
             letraFinal = (letras[iL] === "ו") ? nekudot : letras[iL] + nekudot;
         } else if (vogalYod) {
             letraFinal = (letras[iL] === "י") ? nekudot : letras[iL] + nekudot;
+        } else if (ehSofit && nekudot === "ְ") {
+            // No hebraico, apenas o Kaph Sofit costuma levar Sheva visível (ךְ)
+            letraFinal = letras[iL] + (letras[iL] === "ך" ? "ְ" : "");
         } else {
             letraFinal = letras[iL] + nekudot;
         }
