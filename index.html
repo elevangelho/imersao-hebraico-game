@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    
+    <title>Imersão Hebraico</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #status-bar {
+            display: flex;
+            flex-direction: column;
+            width: 85%;
+            max-width: 300px;
+            margin-bottom: 15px;
+            gap: 5px;
+            visibility: hidden;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7em;
+            letter-spacing: 1px;
+            color: #555;
+        }
+
+        #card-moldura {
+            width: 250px;
+            height: 250px;
+            border: 1px solid #333;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: #050505;
+            margin-bottom: 30px;
+            visibility: hidden;
+        }
+
+        #letra-display {
+            font-family: 'Frank Ruhl Libre', serif;
+            font-size: 130px;
+            line-height: 1;
+            direction: rtl;
+            font-weight: 700;
+        }
+
+        #timer-bar {
+            width: 100%;
+            height: 4px;
+            background: #fff;
+            position: absolute;
+            bottom: 0; left: 0;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        #opcoes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 85%;
+            max-width: 300px;
+            visibility: hidden;
+        }
+
+        .opcao-btn {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #333;
+            padding: 14px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            letter-spacing: 2px;
+            transition: 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-correto { border-color: #2ecc71 !important; color: #2ecc71 !important; background: rgba(46, 204, 113, 0.1); }
+        .btn-errado { border-color: #e74c3c !important; color: #e74c3c !important; background: rgba(231, 76, 60, 0.1); }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            text-align: center;
+        }
+
+        .btn-principal {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1em;
+            font-weight: bold;
+            border-radius: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        #lista-erros { width: 85%; max-width: 280px; margin: 15px 0; border-collapse: collapse; font-size: 0.85em; }
+        #lista-erros td { border: 1px solid #222; padding: 8px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="overlay-inicio" class="overlay">
+        <h2 style="letter-spacing: 4px; margin-bottom: 5px;">DESAFIO IMERSÃO</h2>
+        <h3 style="color: #444; margin-bottom: 35px; font-weight: normal;">ALFABETO + VOGAIS</h3>
+        <button class="btn-principal" onclick="iniciarTudo()">Iniciar Jogo</button>
+    </div>
+
+    <div id="status-bar">
+        <div class="status-row">
+            <div id="vidas">VIDAS: ❤️❤️❤️</div>
+            <div id="pontos">0 PTS</div>
+        </div>
+        <div class="status-row">
+            <div id="info-velocidade">VELOCIDADE: 10s</div>
+            <div id="info-combo">COMBO: 0/5</div>
+        </div>
+    </div>
+
+    <div id="card-moldura">
+        <div id="letra-display"></div>
+        <div id="timer-bar"></div>
+    </div>
+
+    <div id="opcoes-container">
+        <div class="opcao-btn" onclick="verificar(this)"></div>
+        <div class="opcao-btn" onclick="verificar(this)"></div>
+        <div class="opcao-btn" onclick="verificar(this)"></div>
+    </div>
+
+    <div id="overlay-fim" class="overlay" style="display:none;">
+        <h2 style="letter-spacing: 2px; margin-bottom: 5px;">FIM DE JOGO</h2>
+        <div id="final-score" style="font-size: 1.2em; color: #888; margin-bottom: 15px;"></div>
+        <table id="lista-erros">
+            <thead><tr><th>LETRA</th><th>VOCÊ</th><th>CERTO</th></tr></thead>
+            <tbody id="corpo-erros"></tbody>
+        </table>
+        <button class="btn-principal" style="margin-top: 10px;" onclick="reiniciarJogo()">Tentar de Novo</button>
+    </div>
+
+<script>
+    const letras = ["א", "בּ", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "כּ", "כ", "ל", "מ", "נ", "ס", "ע", "פּ", "פ", "צ", "ק", "ר", "שׁ", "שׂ", "ת"];
+    const sonsLetras = ["", "B", "G", "D", "H", "V", "Z", "CH", "T", "Y", "K", "KH", "L", "M", "N", "S", "", "P", "F", "TZ", "Q", "R", "SH", "S", "T"];
+    
+    // Adicionado Hiriq Yod (ִי)
+    const nekudots = ["ָ", "ֵ", "ִ", "ֹ", "ֻ", "וֹ", "וּ", "ְ", "ֲ", "ֱ", "ִי"]; 
+    const sonsVogais = ["A", "E", "I", "O", "U", "O", "U", "E", "A", "E", "I"];
+    
+    const todosSons = [];
+    sonsLetras.forEach(l => sonsVogais.forEach(v => { if (l + v !== "") todosSons.push(l + v); }));
+
+    let vidas = 3, pontos = 0, respostaCorreta, timerInterval, bloqueado = false;
+    let historicoErros = [];
+    let tempoMaximoAtual = 1000;
+    let acertosSeguidos = 0;
+
+    function iniciarTudo() {
+        document.getElementById('overlay-inicio').style.display = 'none';
+        document.getElementById('status-bar').style.visibility = 'visible';
+        document.getElementById('card-moldura').style.visibility = 'visible';
+        document.getElementById('opcoes-container').style.visibility = 'visible';
+        reiniciarJogo();
+    }
+
+    function gerarDesafio() {
+        if (vidas <= 0) return;
+        bloqueado = false;
+        const iL = Math.floor(Math.random() * letras.length);
+        const iV = Math.floor(Math.random() * nekudots.length);
+        
+        let letraFinal;
+        const nekudot = nekudots[iV];
+        const vogalWaw = (nekudot === "וֹ" || nekudot === "וּ");
+        const vogalYod = (nekudot === "ִי");
+
+        let baseSom = (letras[iL] === "א" || letras[iL] === "ע") ? "" : sonsLetras[iL];
+        respostaCorreta = baseSom + sonsVogais[iV];
+        if (respostaCorreta === "") respostaCorreta = sonsVogais[iV];
+
+        // Lógica para evitar duplicação de Waw ou Yod suporte
+        if (vogalWaw) {
+            letraFinal = (letras[iL] === "ו") ? nekudot : letras[iL] + nekudot;
+        } else if (vogalYod) {
+            letraFinal = (letras[iL] === "י") ? nekudot : letras[iL] + nekudot;
+        } else {
+            letraFinal = letras[iL] + nekudot;
+        }
+
+        document.getElementById('letra-display').innerText = letraFinal;
+
+        let opcoes = [respostaCorreta];
+        while(opcoes.length < 3) {
+            let rs = todosSons[Math.floor(Math.random() * todosSons.length)].toUpperCase();
+            if(!opcoes.includes(rs) && rs !== "") opcoes.push(rs);
+        }
+        opcoes.sort(() => Math.random() - 0.5);
+        document.querySelectorAll('.opcao-btn').forEach((btn, i) => { 
+            btn.innerText = opcoes[i]; 
+            btn.className = 'opcao-btn'; 
+        });
+
+        iniciarTimer();
+    }
+
+    function verificar(el) {
+        if(bloqueado) return;
+        bloqueado = true;
+        clearInterval(timerInterval);
+
+        if (el.innerText === respostaCorreta) {
+            el.classList.add('btn-correto');
+            pontos += 10;
+            acertosSeguidos++;
+            if (acertosSeguidos >= 5 && tempoMaximoAtual > 200) tempoMaximoAtual -= 200;
+            atualizarInterface();
+            setTimeout(gerarDesafio, 400);
+        } else {
+            el.classList.add('btn-errado');
+            penalizar(el.innerText);
+        }
+    }
+
+    function penalizar(chute) {
+        vidas--;
+        acertosSeguidos = 0;
+        tempoMaximoAtual = 1000;
+        registrarErro(chute);
+        atualizarInterface();
+        atualizarVidas();
+        document.querySelectorAll('.opcao-btn').forEach(b => {
+            if(b.innerText === respostaCorreta) b.classList.add('btn-correto');
+        });
+        setTimeout(() => {
+            if (vidas <= 0) finalizarJogo();
+            else gerarDesafio();
+        }, 1200);
+    }
+
+    function iniciarTimer() {
+        clearInterval(timerInterval);
+        let tempo = tempoMaximoAtual;
+        timerInterval = setInterval(() => {
+            tempo--;
+            document.getElementById('timer-bar').style.width = (tempo / (tempoMaximoAtual/100)) + "%";
+            if (tempo <= 0) {
+                bloqueado = true;
+                clearInterval(timerInterval);
+                penalizar("TEMPO");
+            }
+        }, 10);
+    }
+
+    function registrarErro(chute) {
+        historicoErros.push({ letra: document.getElementById('letra-display').innerText, digitado: chute, correto: respostaCorreta });
+    }
+
+    function atualizarInterface() {
+        document.getElementById('pontos').innerText = `${pontos} PTS`;
+        document.getElementById('info-combo').innerText = `COMBO: ${acertosSeguidos}/5`;
+        const segs = tempoMaximoAtual/100;
+        document.getElementById('info-velocidade').innerText = `VELOCIDADE: ${segs}s`;
+        document.getElementById('info-velocidade').style.color = (tempoMaximoAtual <= 200) ? "#e74c3c" : "#555";
+    }
+
+    function finalizarJogo() {
+        document.getElementById('overlay-fim').style.display = 'flex';
+        document.getElementById('final-score').innerText = pontos + " PONTOS";
+        document.getElementById('corpo-erros').innerHTML = historicoErros.slice(-3).map(e => 
+            `<tr><td style="font-family:'Frank Ruhl Libre'; font-size:1.5em;">${e.letra}</td><td style="color:#e74c3c">${e.digitado}</td><td style="color:#2ecc71">${e.correto}</td></tr>`
+        ).join('');
+    }
+
+    function reiniciarJogo() {
+        vidas = 3; pontos = 0; historicoErros = [];
+        tempoMaximoAtual = 1000; acertosSeguidos = 0;
+        atualizarInterface();
+        atualizarVidas();
+        document.getElementById('overlay-fim').style.display = 'none';
+        gerarDesafio();
+    }
+
+    function atualizarVidas() { document.getElementById('vidas').innerText = "VIDAS: " + "❤️".repeat(vidas); }
+</script>
+</body>
+</html>
