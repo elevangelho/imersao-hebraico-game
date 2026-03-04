@@ -146,7 +146,6 @@
             border: 1px solid #333;
         }
 
-        /* Ícone de Play em Pixel Art */
         .pixel-play {
             width: 16px;
             height: 16px;
@@ -204,9 +203,9 @@
     </div>
 
 <script>
-    // Inclusão das Letras Sofit (Finais)
-    const letras = ["א", "בּ", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "כּ", "כ", "ל", "מ", "נ", "ס", "ע", "פּ", "פ", "צ", "ק", "ר", "שׁ", "שׂ", "ת", "ך", "ם", "ן", "ף", "ץ"];
-    const sonsLetras = ["", "B", "G", "D", "H", "V", "Z", "CH", "T", "Y", "K", "KH", "L", "M", "N", "S", "", "P", "F", "TZ", "Q", "R", "SH", "S", "T", "KH", "M", "N", "F", "TZ"];
+    // Letras Sofit removidas
+    const letras = ["א", "בּ", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "כּ", "כ", "ל", "מ", "נ", "ס", "ע", "פּ", "פ", "צ", "ק", "ר", "שׁ", "שׂ", "ת"];
+    const sonsLetras = ["", "B", "G", "D", "H", "V", "Z", "CH", "T", "Y", "K", "KH", "L", "M", "N", "S", "", "P", "F", "TZ", "Q", "R", "SH", "S", "T"];
     
     const nekudots = ["ָ", "ֵ", "ִ", "ֹ", "ֻ", "וֹ", "וּ", "ְ", "ֲ", "ֱ", "ִי"]; 
     const sonsVogais = ["A", "E", "I", "O", "U", "O", "U", "E", "A", "E", "I"];
@@ -237,20 +236,15 @@
         const nekudot = nekudots[iV];
         const vogalWaw = (nekudot === "וֹ" || nekudot === "וּ");
         const vogalYod = (nekudot === "ִי");
-        const ehSofit = ["ך", "ם", "ן", "ף", "ץ"].includes(letras[iL]);
 
         let baseSom = (letras[iL] === "א" || letras[iL] === "ע") ? "" : sonsLetras[iL];
         respostaCorreta = baseSom + sonsVogais[iV];
         if (respostaCorreta === "") respostaCorreta = sonsVogais[iV];
 
-        // Lógica de renderização
         if (vogalWaw) {
             letraFinal = (letras[iL] === "ו") ? nekudot : letras[iL] + nekudot;
         } else if (vogalYod) {
             letraFinal = (letras[iL] === "י") ? nekudot : letras[iL] + nekudot;
-        } else if (ehSofit && nekudot === "ְ") {
-            // No hebraico, apenas o Kaph Sofit costuma levar Sheva visível (ךְ)
-            letraFinal = letras[iL] + (letras[iL] === "ך" ? "ְ" : "");
         } else {
             letraFinal = letras[iL] + nekudot;
         }
